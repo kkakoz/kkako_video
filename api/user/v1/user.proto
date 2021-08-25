@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = ".;v1";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/timestamp.proto";
+//import "validate/validate.proto";
+
+service UserService {
+  rpc UserInfo (GetUserReq) returns (GetUserRes) {
+    option (google.api.http) = {
+      get: "/v1/users/:id"
+      body: "*"
+    };
+  };
+
+  rpc UserNews (UserNewsReq) returns (UserNewsRes) {
+    option (google.api.http) = {
+      post: "/v1/users/:id/news"
+    };
+  };
+
+}
+
+message GetUserReq {
+  // @inject_tag: form:"id"
+  int64 id = 1;
+}
+
+message GetUserRes {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string email = 4;
+  string brief = 5;
+}
+
+message UserNewsReq {}
+
+message UserNewsRes {}

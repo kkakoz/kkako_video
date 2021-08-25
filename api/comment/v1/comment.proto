@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option go_package = ".;v1";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/timestamp.proto";
+//import "validate/validate.proto";
+
+service CommentService {
+  rpc AddComment (AddCommentReq) returns (AddCommentRes) {
+    option (google.api.http) = {
+      post: "/v1/comments"
+      body: "*"
+    };
+  };
+
+  rpc VideoCommentList (VideoCommentListReq) returns (VideoCommentListRes) {
+
+  };
+
+  rpc Comment (CommentReq) returns (CommentRes) {
+    option (google.api.http) = {
+      get: "/v1/comments/:id"
+    };
+  }
+
+}
+
+message AddCommentReq {
+  int64 videoId = 1;
+  int64 userId = 2;
+  string content = 3;
+}
+
+message AddCommentRes {}
+
+message VideoCommentListReq {
+  int64 videoId = 1;
+  int32 sort = 2;
+}
+
+message VideoCommentListRes {
+  repeated CommentReq items = 1;
+}
+
+message CommentReq {}
+
+message CommentRes {}
+
