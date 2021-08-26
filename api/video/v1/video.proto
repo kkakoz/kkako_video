@@ -2,10 +2,7 @@ syntax = "proto3";
 
 option go_package = ".;v1";
 
-import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/timestamp.proto";
 //import "validate/validate.proto";
 
 service VideoService {
