@@ -6,20 +6,20 @@ import "google/api/annotations.proto";
 //import "validate/validate.proto";
 
 service VideoService {
-  rpc VideoInfo (GetUserReq) returns (GetUserRes) {
+  rpc VideoInfo (VideoGetReq) returns (VideoGetRes) {
     option (google.api.http) = {
       get: "/v1/videos/:id"
       body: "*"
     };
   };
 
-  rpc Videos (UserNewsReq) returns (UserNewsRes) {
+  rpc Videos (VideoNewsReq) returns (VideoNewsRes) {
     option (google.api.http) = {
       get: "/v1/videos"
     };
   };
 
-  rpc AddVideo (UserNewsReq) returns (UserNewsRes) {
+  rpc AddVideo (VideoNewsReq) returns (VideoNewsRes) {
     option (google.api.http) = {
       post: "/v1/videos"
       body: "*"
@@ -28,12 +28,11 @@ service VideoService {
 
 }
 
-message GetUserReq {
-  // @inject_tag: form:"id"
+message VideoGetReq {
   int64 id = 1;
 }
 
-message GetUserRes {
+message VideoGetRes {
   int64 id = 1;
   string name = 2;
   string avatar = 3;
@@ -41,6 +40,6 @@ message GetUserRes {
   string brief = 5;
 }
 
-message UserNewsReq {}
+message VideoNewsReq {}
 
-message UserNewsRes {}
+message VideoNewsRes {}
