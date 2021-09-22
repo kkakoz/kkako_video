@@ -4,20 +4,20 @@ import (
 	"context"
 	"github.com/jinzhu/copier"
 	v1 "kkako_video/api/user/v1"
-	"kkako_video/internal/user/user_repo/domain"
+	domain2 "kkako_video/internal/user_repo/domain"
 )
 
 type UserRepoHandler struct {
 	v1.UnimplementedUserRepoServiceServer
-	userRepo domain.IUserRepo
+	userRepo domain2.IUserRepo
 }
 
-func NewUserRepoHandler(userRepo domain.IUserRepo) *UserRepoHandler {
+func NewUserRepoHandler(userRepo domain2.IUserRepo) *UserRepoHandler {
 	return &UserRepoHandler{userRepo: userRepo}
 }
 
 func (u UserRepoHandler) AddUser(ctx context.Context, req *v1.AddUserReq) (*v1.AddUserRes, error) {
-	user := &domain.User{
+	user := &domain2.User{
 		Name:     req.Name,
 		Password: req.Password,
 		Email:    req.Email,
@@ -48,8 +48,8 @@ func (u UserRepoHandler) UserList(ctx context.Context, req *v1.UserListReq) (*v1
 	return res, err
 }
 
-func (u UserRepoHandler) GetByEmail(ctx context.Context,req *v1.EmailReq) (*v1.UserRes, error) {
-	user, err := u.userRepo.GetUserByEmail(ctx, req.Email)
+func (u UserRepoHandler) GetByCondition(ctx context.Context,req *v1.ConditionReq) (*v1.UserRes, error) {
+	user, err := u.userRepo.GetUser(ctx, req.Email)
 	res := &v1.UserRes{}
 	if err != nil {
 		return res, err

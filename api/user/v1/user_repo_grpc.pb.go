@@ -21,7 +21,7 @@ type UserRepoServiceClient interface {
 	AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRes, error)
 	GetUserById(ctx context.Context, in *UserIdReq, opts ...grpc.CallOption) (*UserRes, error)
 	UserList(ctx context.Context, in *UserListReq, opts ...grpc.CallOption) (*UserListRes, error)
-	GetByEmail(ctx context.Context, in *EmailReq, opts ...grpc.CallOption) (*UserRes, error)
+	GetByCondition(ctx context.Context, in *ConditionReq, opts ...grpc.CallOption) (*UserRes, error)
 }
 
 type userRepoServiceClient struct {
@@ -59,9 +59,9 @@ func (c *userRepoServiceClient) UserList(ctx context.Context, in *UserListReq, o
 	return out, nil
 }
 
-func (c *userRepoServiceClient) GetByEmail(ctx context.Context, in *EmailReq, opts ...grpc.CallOption) (*UserRes, error) {
+func (c *userRepoServiceClient) GetByCondition(ctx context.Context, in *ConditionReq, opts ...grpc.CallOption) (*UserRes, error) {
 	out := new(UserRes)
-	err := c.cc.Invoke(ctx, "/v1.UserRepoService/GetByEmail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/v1.UserRepoService/GetByCondition", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ type UserRepoServiceServer interface {
 	AddUser(context.Context, *AddUserReq) (*AddUserRes, error)
 	GetUserById(context.Context, *UserIdReq) (*UserRes, error)
 	UserList(context.Context, *UserListReq) (*UserListRes, error)
-	GetByEmail(context.Context, *EmailReq) (*UserRes, error)
+	GetByCondition(context.Context, *ConditionReq) (*UserRes, error)
 	mustEmbedUnimplementedUserRepoServiceServer()
 }
 
@@ -92,8 +92,8 @@ func (UnimplementedUserRepoServiceServer) GetUserById(context.Context, *UserIdRe
 func (UnimplementedUserRepoServiceServer) UserList(context.Context, *UserListReq) (*UserListRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserList not implemented")
 }
-func (UnimplementedUserRepoServiceServer) GetByEmail(context.Context, *EmailReq) (*UserRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetByEmail not implemented")
+func (UnimplementedUserRepoServiceServer) GetByCondition(context.Context, *ConditionReq) (*UserRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByCondition not implemented")
 }
 func (UnimplementedUserRepoServiceServer) mustEmbedUnimplementedUserRepoServiceServer() {}
 
@@ -162,20 +162,20 @@ func _UserRepoService_UserList_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserRepoService_GetByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmailReq)
+func _UserRepoService_GetByCondition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConditionReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserRepoServiceServer).GetByEmail(ctx, in)
+		return srv.(UserRepoServiceServer).GetByCondition(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/v1.UserRepoService/GetByEmail",
+		FullMethod: "/v1.UserRepoService/GetByCondition",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserRepoServiceServer).GetByEmail(ctx, req.(*EmailReq))
+		return srv.(UserRepoServiceServer).GetByCondition(ctx, req.(*ConditionReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -200,8 +200,8 @@ var UserRepoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserRepoService_UserList_Handler,
 		},
 		{
-			MethodName: "GetByEmail",
-			Handler:    _UserRepoService_GetByEmail_Handler,
+			MethodName: "GetByCondition",
+			Handler:    _UserRepoService_GetByCondition_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

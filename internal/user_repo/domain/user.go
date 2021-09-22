@@ -18,5 +18,5 @@ type IUserRepo interface {
 	AddUser(ctx context.Context, user *User) error
 	GetUserById(ctx context.Context, id int64) (*User, error)
 	GetUserList(ctx context.Context, ids []int64) ([]*User, error)
-	GetUserByEmail(ctx context.Context, email string) (*User, error)
+	GetUser(ctx context.Context, email string) (*User, error)
 }

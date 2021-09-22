@@ -19,6 +19,18 @@ service UserService {
     };
   };
 
+  rpc UserFollow (UserFollowReq) returns (UserFollowRes) {
+    option (google.api.http) = {
+      post: "/v1/users/:id/follows"
+    };
+  };
+
+  rpc UserLike (UserLikeReq) returns (UserLikeRes) {
+    option (google.api.http) = {
+      post: "/v1/users/:id/likes"
+    };
+  };
+
 }
 
 message GetUserReq {
@@ -37,3 +49,17 @@ message GetUserRes {
 message UserNewsReq {}
 
 message UserNewsRes {}
+
+message UserFollowReq {
+  int32 type = 1;
+  int64 id = 2;
+}
+
+message UserFollowRes {}
+
+message UserLikeReq {
+  int32 type = 1;
+  int64 id = 2;
+}
+
+message UserLikeRes {}

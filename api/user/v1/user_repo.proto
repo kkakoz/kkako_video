@@ -15,7 +15,7 @@ service UserRepoService {
 
   }
 
-  rpc GetByEmail(EmailReq) returns(UserRes) {
+  rpc GetByCondition(ConditionReq) returns(UserRes) {
 
   }
 }
@@ -51,6 +51,6 @@ message UserListRes {
   repeated UserRes userList = 1;
 }
 
-message EmailReq {
+message ConditionReq {
   string email = 1;
 }

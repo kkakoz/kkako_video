@@ -20,6 +20,8 @@ const _ = grpc.SupportPackageIsVersion7
 type UserServiceClient interface {
 	UserInfo(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRes, error)
 	UserNews(ctx context.Context, in *UserNewsReq, opts ...grpc.CallOption) (*UserNewsRes, error)
+	UserFollow(ctx context.Context, in *UserFollowReq, opts ...grpc.CallOption) (*UserFollowRes, error)
+	UserLike(ctx context.Context, in *UserLikeReq, opts ...grpc.CallOption) (*UserLikeRes, error)
 }
 
 type userServiceClient struct {
@@ -48,12 +50,32 @@ func (c *userServiceClient) UserNews(ctx context.Context, in *UserNewsReq, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) UserFollow(ctx context.Context, in *UserFollowReq, opts ...grpc.CallOption) (*UserFollowRes, error) {
+	out := new(UserFollowRes)
+	err := c.cc.Invoke(ctx, "/UserService/UserFollow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UserLike(ctx context.Context, in *UserLikeReq, opts ...grpc.CallOption) (*UserLikeRes, error) {
+	out := new(UserLikeRes)
+	err := c.cc.Invoke(ctx, "/UserService/UserLike", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
 	UserInfo(context.Context, *GetUserReq) (*GetUserRes, error)
 	UserNews(context.Context, *UserNewsReq) (*UserNewsRes, error)
+	UserFollow(context.Context, *UserFollowReq) (*UserFollowRes, error)
+	UserLike(context.Context, *UserLikeReq) (*UserLikeRes, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -66,6 +88,12 @@ func (UnimplementedUserServiceServer) UserInfo(context.Context, *GetUserReq) (*G
 }
 func (UnimplementedUserServiceServer) UserNews(context.Context, *UserNewsReq) (*UserNewsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserNews not implemented")
+}
+func (UnimplementedUserServiceServer) UserFollow(context.Context, *UserFollowReq) (*UserFollowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserFollow not implemented")
+}
+func (UnimplementedUserServiceServer) UserLike(context.Context, *UserLikeReq) (*UserLikeRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserLike not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -116,6 +144,42 @@ func _UserService_UserNews_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UserFollow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserFollowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UserFollow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/UserFollow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UserFollow(ctx, req.(*UserFollowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UserLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLikeReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UserLike(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/UserLike",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UserLike(ctx, req.(*UserLikeReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +194,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserNews",
 			Handler:    _UserService_UserNews_Handler,
+		},
+		{
+			MethodName: "UserFollow",
+			Handler:    _UserService_UserFollow_Handler,
+		},
+		{
+			MethodName: "UserLike",
+			Handler:    _UserService_UserLike_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

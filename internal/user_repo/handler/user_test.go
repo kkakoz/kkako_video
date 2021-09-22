@@ -6,8 +6,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/viper"
 	v1 "kkako_video/api/user/v1"
-	"kkako_video/internal/user/user_repo/handler"
-	"kkako_video/internal/user/user_repo/repo"
+	handler2 "kkako_video/internal/user_repo/handler"
+	repo2 "kkako_video/internal/user_repo/repo"
 	"kkako_video/pkg/db/mysqlx"
 	"log"
 	"testing"
@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 
 func TestUserRepoHandler(t *testing.T) {
 	Convey("user_repo", t, func() {
-		repoHandler := handler.NewUserRepoHandler(repo.NewUserRepo())
+		repoHandler := handler2.NewUserRepoHandler(repo2.NewUserRepo())
 		ctx := context.TODO()
 		type user struct {
 			ID       int64
