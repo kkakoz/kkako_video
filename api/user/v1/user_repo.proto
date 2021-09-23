@@ -8,16 +8,13 @@ service UserRepoService {
   rpc AddUser (AddUserReq) returns (AddUserRes) {
   };
 
-  rpc GetUserById (UserIdReq) returns (UserRes) {
-  };
+  rpc GetUserById (UserIdReq) returns (UserRes) {};
 
-  rpc UserList (UserListReq) returns (UserListRes) {
+  rpc UserList (UserListReq) returns (UserListRes) {}
 
-  }
+  rpc GetByCondition(ConditionReq) returns (UserRes) {}
 
-  rpc GetByCondition(ConditionReq) returns(UserRes) {
-
-  }
+  rpc UpdateUser(UserUpdateReq) returns (UserUpdateRes) {}
 }
 
 
@@ -41,6 +38,7 @@ message UserRes {
   string email = 3;
   string avatar = 4;
   string password = 5;
+  string salt = 6;
 }
 
 message UserListReq {
@@ -54,3 +52,12 @@ message UserListRes {
 message ConditionReq {
   string email = 1;
 }
+
+message UserUpdateReq {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message UserUpdateRes {}

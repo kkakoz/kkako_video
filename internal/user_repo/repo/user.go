@@ -27,15 +27,17 @@ func (u UserRepo) AddUser(ctx context.Context, user *domain.User) error {
 	return errors.Wrap(err, "添加用户失败")
 }
 
-func (u UserRepo) GetUserById(ctx context.Context, id int64) (user *domain.User, err error) {
+func (u UserRepo) GetUserById(ctx context.Context, id int64) (*domain.User, error) {
 	db := mysqlx.GetDB(ctx)
-	err = db.Where("id = ?", id).Find(user).Error
+	user := &domain.User{}
+	err := db.Where("id = ?", id).Find(user).Error
 	return user, errors.Wrap(err, "查找失败")
 }
 
-func (u UserRepo) GetUserList(ctx context.Context, ids []int64) (list []*domain.User, err error) {
+func (u UserRepo) GetUserList(ctx context.Context, ids []int64) ([]*domain.User, error) {
 	db := mysqlx.GetDB(ctx)
-	err = db.Where("id in ?", ids).Find(&list).Error
+	list := make([]*domain.User, 0)
+	err := db.Where("id in ?", ids).Find(&list).Error
 	return list, errors.Wrap(err, "查找失败")
 }
 

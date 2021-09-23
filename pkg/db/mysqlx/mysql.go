@@ -102,3 +102,17 @@ type Model struct {
 }
 
 var MysqlSet = wire.NewSet(New)
+
+func FlushDB() {
+
+	var tables []string
+	err := db.Table("information_schema.tables").Where("table_schema = ?", "kkako_video_test").Pluck("table_name", &tables).Error
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	for _, table := range tables {
+		db.Table(table).Exec(fmt.Sprintf("truncate table `%s`", table))
+	}
+
+}
