@@ -14,7 +14,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	viper.AddConfigPath("../../../config")
+	viper.AddConfigPath("../../../configs")
 	viper.SetConfigName("test")
 	viper.SetConfigType("yaml")
 	err := viper.ReadInConfig()

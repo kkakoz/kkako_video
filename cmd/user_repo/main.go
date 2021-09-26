@@ -13,17 +13,18 @@ func newApp(grpcServer *grpc.Server) (*app.App, error) {
 	return app.NewApp(
 		app.Name(appName),
 		app.Port("9001"),
+		app.GrpcServer(grpcServer),
 	)
 }
 
-var conf *bool
+var conf = new(bool)
 var appName = "user_repo"
 
 func main() {
 	flag.BoolVar(conf, "conf", false, "false is from file, true is from env")
 	flag.Parse()
 	if *conf == false {
-		viper.AddConfigPath("../config")
+		viper.AddConfigPath("configs")
 		viper.SetConfigName(appName)
 		viper.SetConfigType("yaml")
 		err := viper.ReadInConfig()
@@ -39,4 +40,12 @@ func main() {
 		log.Fatalln("open mysql err:", err)
 	}
 
+	app, err := initApp(viper.GetViper())
+	if err != nil {
+		log.Fatalln("init app err:", err)
+	}
+	err = app.Start()
+	if err != nil {
+		log.Fatalln("app start err:", err)
+	}
 }

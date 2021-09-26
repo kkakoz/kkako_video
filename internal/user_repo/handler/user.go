@@ -69,3 +69,7 @@ func (u UserRepoHandler) GetByCondition(ctx context.Context,req *v1.ConditionReq
 	err = copier.Copy(res, user)
 	return res, err
 }
+
+func (u UserRepoHandler) UpdateUser(context.Context, *v1.UserUpdateReq) (*v1.UserUpdateRes, error) {
+	panic("un implement")
+}

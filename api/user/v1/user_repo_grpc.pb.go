@@ -22,6 +22,7 @@ type UserRepoServiceClient interface {
 	GetUserById(ctx context.Context, in *UserIdReq, opts ...grpc.CallOption) (*UserRes, error)
 	UserList(ctx context.Context, in *UserListReq, opts ...grpc.CallOption) (*UserListRes, error)
 	GetByCondition(ctx context.Context, in *ConditionReq, opts ...grpc.CallOption) (*UserRes, error)
+	UpdateUser(ctx context.Context, in *UserUpdateReq, opts ...grpc.CallOption) (*UserUpdateRes, error)
 }
 
 type userRepoServiceClient struct {
@@ -68,6 +69,15 @@ func (c *userRepoServiceClient) GetByCondition(ctx context.Context, in *Conditio
 	return out, nil
 }
 
+func (c *userRepoServiceClient) UpdateUser(ctx context.Context, in *UserUpdateReq, opts ...grpc.CallOption) (*UserUpdateRes, error) {
+	out := new(UserUpdateRes)
+	err := c.cc.Invoke(ctx, "/v1.UserRepoService/UpdateUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserRepoServiceServer is the server API for UserRepoService service.
 // All implementations must embed UnimplementedUserRepoServiceServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type UserRepoServiceServer interface {
 	GetUserById(context.Context, *UserIdReq) (*UserRes, error)
 	UserList(context.Context, *UserListReq) (*UserListRes, error)
 	GetByCondition(context.Context, *ConditionReq) (*UserRes, error)
+	UpdateUser(context.Context, *UserUpdateReq) (*UserUpdateRes, error)
 	mustEmbedUnimplementedUserRepoServiceServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedUserRepoServiceServer) UserList(context.Context, *UserListReq
 }
 func (UnimplementedUserRepoServiceServer) GetByCondition(context.Context, *ConditionReq) (*UserRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByCondition not implemented")
+}
+func (UnimplementedUserRepoServiceServer) UpdateUser(context.Context, *UserUpdateReq) (*UserUpdateRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
 func (UnimplementedUserRepoServiceServer) mustEmbedUnimplementedUserRepoServiceServer() {}
 
@@ -180,6 +194,24 @@ func _UserRepoService_GetByCondition_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserRepoService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserUpdateReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserRepoServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.UserRepoService/UpdateUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserRepoServiceServer).UpdateUser(ctx, req.(*UserUpdateReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserRepoService_ServiceDesc is the grpc.ServiceDesc for UserRepoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +234,10 @@ var UserRepoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByCondition",
 			Handler:    _UserRepoService_GetByCondition_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _UserRepoService_UpdateUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
