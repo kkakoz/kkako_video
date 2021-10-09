@@ -7,7 +7,7 @@ import (
 )
 
 func NewUserRepoClient() (v1.UserRepoServiceClient, error) {
-	conn, err := grpc.Dial("dns///user-repo", grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
+	conn, err := grpc.Dial("dns///" + UserRepoAddr, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
 	if err != nil {
 		return nil, err
 	}

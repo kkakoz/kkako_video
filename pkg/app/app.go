@@ -10,6 +10,7 @@ import (
 type App struct {
 	Name       string
 	Port       string
+	IP         string
 	logger     *zap.Logger
 	grpcServer *grpc.Server
 }
@@ -60,6 +61,15 @@ func Port(port string) Option {
 	return Option{
 		f: func(app *App) error {
 			app.Port = port
+			return nil
+		},
+	}
+}
+
+func IP(ip string) Option {
+	return Option{
+		f: func(app *App) error {
+			app.IP = ip
 			return nil
 		},
 	}

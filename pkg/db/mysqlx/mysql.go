@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/google/wire"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -100,8 +99,6 @@ type Model struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
-
-var MysqlSet = wire.NewSet(New)
 
 func FlushDB() {
 
