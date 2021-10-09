@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"net"
 )
 
@@ -37,6 +38,7 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
+	reflection.Register(a.grpcServer)
 	err = a.grpcServer.Serve(listen)
 	if err != nil {
 		return errors.Wrap(err, "app start err")

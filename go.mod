@@ -20,6 +20,8 @@ require (
 
 require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/fullstorydev/grpcui v1.1.0 // indirect
+	github.com/fullstorydev/grpcurl v1.7.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -29,6 +31,7 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jhump/protoreflect v1.6.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.2 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
@@ -37,7 +40,7 @@ require (
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/pelletier/go-toml v1.9.3 // indirect
-	github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d // indirect
+	github.com/smartystreets/assertions v1.0.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

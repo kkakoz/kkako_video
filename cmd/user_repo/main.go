@@ -12,28 +12,31 @@ import (
 )
 
 func newApp(grpcServer *grpc.Server) (*app.App, error) {
-	name, b := os.LookupEnv("MY_POD_NAME")
-	if !b {
-		return nil, errors.New("get name err")
+	options := make([]app.Option, 0)
+	if !*debug {
+		name, b := os.LookupEnv("MY_POD_NAME")
+		if !b {
+			return nil, errors.New("get name err")
+		}
+		options = append(options, app.Name(name))
+		ip, b := os.LookupEnv("MY_POD_IP")
+		if !b {
+			return nil, errors.New("get ip err")
+		}
+		options = append(options, app.IP(ip))
 	}
-	ip, b := os.LookupEnv("MY_POD_IP")
-	if !b {
-		return nil, errors.New("get ip err")
-	}
+	options = append(options, app.Port("9001"), app.GrpcServer(grpcServer))
 	return app.NewApp(
-		app.Name(name),
-		app.IP(ip),
-		app.Port("9001"),
-		app.GrpcServer(grpcServer),
+		options...
 	)
 }
 
 var debug = new(bool)
 
 func main() {
-	flag.BoolVar(debug, "debug", true, "false is from file, true is from env")
+	flag.BoolVar(debug, "debug", false, "false is from file, true is from env")
 	flag.Parse()
-	if *debug == true {
+	if *debug {
 		viper.AddConfigPath("configs")
 		viper.SetConfigName("test")
 		viper.SetConfigType("yaml")
