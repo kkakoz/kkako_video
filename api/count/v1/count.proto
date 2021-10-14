@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+option go_package = ".;v1";
+
+import "google/api/annotations.proto";
+//import "validate/validate.proto";
+
+service CountService {
+  rpc UserCount (UserCountReq) returns (UserCountRes) {
+    option (google.api.http) = {
+      get: "/v1/users/:user_id/count"
+      body: "*"
+    };
+  };
+
+  rpc UserLike (UserLikeReq) returns (UserLikeRes) {
+    option (google.api.http) = {
+      get: "/v1/users/:user_id/likes/:target_id"
+      body: "*"
+    };
+  };
+
+  rpc UserFollow (UserLikeReq) returns (UserLikeRes) {
+    option (google.api.http) = {
+      get: "/v1/users/:user_id/follows/:target_id"
+      body: "*"
+    };
+  };
+
+}
+
+message UserCountReq {
+  int64 userId = 1;
+  int32 countType = 2;
+}
+
+message UserCountRes {}
+
+message UserLikeReq {
+  int64 userId = 1;
+  int64 targetId = 2;
+  int32 targetType = 3;
+}
+
+message UserLikeRes {
+
+}
+
+message UserFollowReq {
+  int64 userId = 1;
+  int64 targetId = 2;
+  int32 targetType = 3;
+}
+
+message UserFollowRes {
+
+}
+

@@ -11,6 +11,17 @@ type Auth struct {
 	Auth     int32  `json:"auth"`
 }
 
+type User struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Avatar      string  `json:"avatar"`
+	Brief       string  `json:"brief"`
+	FollowCount int64   `json:"follow_count"`
+	FansCount   int64   `json:"fans_count"`
+	LikeCount   int64   `json:"like_count"`
+	State       int32   `json:"state"`
+}
+
 type IAuthLogic interface {
 	Register(ctx context.Context, user *Auth, name string) error
 	Login(ctx context.Context, user *Auth) (int64, string, error)

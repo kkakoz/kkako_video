@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
 	v1 "kkako_video/api/user/v1"
 	"kkako_video/internal/user/domain"
 )
@@ -12,7 +13,13 @@ type UserHandler struct {
 }
 
 func (u UserHandler) GetUser(ctx context.Context, req *v1.GetUserReq) (*v1.GetUserRes, error) {
-	panic("implement me")
+	user, err := u.userLogic.GetUser(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	res := &v1.GetUserRes{}
+	err = copier.Copy(res, user)
+	return res, err
 }
 
 func (u UserHandler) UserNews(ctx context.Context, req *v1.UserNewsReq) (*v1.UserNewsRes, error) {
@@ -28,7 +35,13 @@ func (u UserHandler) UserLike(ctx context.Context, req *v1.UserLikeReq) (*v1.Use
 }
 
 func (u UserHandler) AddUser(ctx context.Context, req *v1.AddUserReq) (*v1.AddUserRes, error) {
-	panic("implement me")
+	user := &domain.User{}
+	err := copier.Copy(user, req)
+	if err != nil {
+		return nil, err
+	}
+	err = u.userLogic.AddUser(ctx, user)
+	return &v1.AddUserRes{}, err
 }
 
 func NewUserHandler(userLogic domain.IUserLogic) *UserHandler {

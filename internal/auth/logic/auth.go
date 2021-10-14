@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	v1 "kkako_video/api/user/v1"
 	"kkako_video/internal/auth/domain"
 	"kkako_video/internal/pkg/jwtx"
@@ -15,7 +16,14 @@ type AuthLogic struct {
 }
 
 func (u AuthLogic) Register(ctx context.Context, auth *domain.Auth, name string) error {
-	err := u.authRepo.AddAuth(ctx, auth)
+	auth, err := u.authRepo.GetAuthByEmail(ctx, auth.Email)
+	if err != nil {
+		return err
+	}
+	if auth.ID != 0 {
+		return errors.New("该邮件已经注册")
+	}
+	err = u.authRepo.AddAuth(ctx, auth)
 	if err != nil {
 		return err
 	}
@@ -39,7 +47,7 @@ func (u AuthLogic) Login(ctx context.Context, auth *domain.Auth) (int64, string,
 	if err != nil {
 		return 0, "", err
 	}
-	token, err := u.jwtGen.GenTokenExpire(user.Id, user.Name, user.State, auth.Auth, time.Hour*24*3)
+	token, err := u.jwtGen.GenTokenExpire(auth.UserId, user.Name, user.State, auth.Auth, time.Hour*24*3)
 	if err != nil {
 		return 0, "", err
 	}

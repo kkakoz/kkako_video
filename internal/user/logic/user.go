@@ -14,11 +14,11 @@ func (u UserLogic) AddUser(ctx context.Context, user *domain.User) error {
 }
 
 func (u UserLogic) GetUser(ctx context.Context, id int64) (*domain.User, error) {
-	panic("implement me")
+	return u.userRepo.GetUser(ctx, id)
 }
 
 func (u UserLogic) GetUsers(ctx context.Context, ids []int64) ([]*domain.User, error) {
-	panic("implement me")
+	return u.userRepo.GetUserList(ctx, ids)
 }
 
 func NewUserLogic() domain.IUserLogic {

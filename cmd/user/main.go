@@ -13,11 +13,9 @@ import (
 	"kkako_video/pkg/db/mysqlx"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
-func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server) (*app.App, error) {
+func newApp(ctx context.Context, grpcServer *grpc.Server) (*app.App, error) {
 	options := make([]app.Option, 0)
 	var debug bool
 	flag.BoolVar(&debug, "debug", false, "false is from file, true is from env")
@@ -34,10 +32,9 @@ func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Ser
 		}
 		options = append(options, app.IP(ip))
 	}
-	options = append(options, app.Port("9002"), app.GrpcServer(grpcServer))
+	options = append(options, app.Port("9001"), app.GrpcServer(grpcServer))
 	return app.NewApp(
 		ctx,
-		cancel,
 		options...,
 	)
 }
@@ -55,22 +52,14 @@ func main() {
 	fx.New(
 		auth.Provider,
 		fx.Supply(viper),
-		fx.Provide(func() (context.Context, context.CancelFunc) {
-			return ctx, cancel
+		fx.Provide(func() context.Context {
+			return ctx
 		}),
 		client.Provider,
 		fx.Provide(newApp),
 		fx.Populate(&app),
 	)
-	// 用于捕获退出信号
-	quit := make(chan os.Signal)
-
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
-	go func() {
-		<-quit
-		cancel()
-	}()
 	if err := app.Start(); err != nil {  // 手动调用Start
 		log.Fatal(err)
 	}

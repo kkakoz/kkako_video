@@ -14,14 +14,16 @@ type App struct {
 	Port       string `json:"port"`
 	IP         string `json:"ip"`
 	Ctx        context.Context
+	Cancel     context.CancelFunc
 	Logger     *zap.Logger
 	GrpcServer *grpc.Server
 	servers    []Server
 }
 
-func NewApp(ctx context.Context, opts ...Option) (*App, error) {
+func NewApp(ctx context.Context, cancel context.CancelFunc, opts ...Option) (*App, error) {
 	app := &App{
-		Ctx: ctx,
+		Ctx:    ctx,
+		Cancel: cancel,
 	}
 	for _, opt := range opts {
 		err := opt.f(app)
@@ -38,10 +40,6 @@ func (a *App) Start() error {
 		return err
 	}
 	reflection.Register(a.GrpcServer)
-	err = a.GrpcServer.Serve(listen)
-	if err != nil {
-		return errors.Wrap(err, "app start err")
-	}
 	go func() {
 		<-a.Ctx.Done()
 		a.GrpcServer.Stop()
@@ -50,11 +48,19 @@ func (a *App) Start() error {
 		}
 	}()
 	for _, server := range a.servers {
-		err = server.Run()
-		if err != nil {
-			return err
-		}
+		go func() {
+			err := server.Run()
+			if err != nil {
+				a.Logger.Fatal("server err", zap.Error(err))
+				a.Cancel()
+			}
+		}()
 	}
+	err = a.GrpcServer.Serve(listen)
+	if err != nil {
+		return errors.Wrap(err, "app start err")
+	}
+
 	return nil
 }
 
