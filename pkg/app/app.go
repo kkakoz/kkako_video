@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -9,27 +10,25 @@ import (
 )
 
 type App struct {
-	Name       string
-	Port       string
-	IP         string
-	logger     *zap.Logger
-	grpcServer *grpc.Server
+	Name       string `json:"name"`
+	Port       string `json:"port"`
+	IP         string `json:"ip"`
+	Ctx        context.Context
+	Logger     *zap.Logger
+	GrpcServer *grpc.Server
+	servers    []Server
 }
 
-func NewApp(opts ...Option) (*App, error) {
-	app := &App{}
+func NewApp(ctx context.Context, opts ...Option) (*App, error) {
+	app := &App{
+		Ctx: ctx,
+	}
 	for _, opt := range opts {
 		err := opt.f(app)
 		if err != nil {
 			return app, err
 		}
 	}
-	//app := &App{}
-	//err := viper.UnmarshalKey("app", app)
-	//if err != nil {
-	//	return nil, errors.Wrap(err, "viper unmarshal失败")
-	//}
-	//app.grpcServer = grpcServer
 	return app, nil
 }
 
@@ -38,10 +37,23 @@ func (a *App) Start() error {
 	if err != nil {
 		return err
 	}
-	reflection.Register(a.grpcServer)
-	err = a.grpcServer.Serve(listen)
+	reflection.Register(a.GrpcServer)
+	err = a.GrpcServer.Serve(listen)
 	if err != nil {
 		return errors.Wrap(err, "app start err")
+	}
+	go func() {
+		<-a.Ctx.Done()
+		a.GrpcServer.Stop()
+		for _, server := range a.servers {
+			server.Stop()
+		}
+	}()
+	for _, server := range a.servers {
+		err = server.Run()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -77,10 +89,19 @@ func IP(ip string) Option {
 	}
 }
 
+func RegisterServer(server Server) Option {
+	return Option{
+		f: func(app *App) error {
+			app.servers = append(app.servers, server)
+			return nil
+		},
+	}
+}
+
 func GrpcServer(server *grpc.Server) Option {
 	return Option{
 		f: func(app *App) error {
-			app.grpcServer = server
+			app.GrpcServer = server
 			return nil
 		},
 	}

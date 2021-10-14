@@ -18,7 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	UserInfo(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRes, error)
+	GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRes, error)
+	AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRes, error)
 	UserNews(ctx context.Context, in *UserNewsReq, opts ...grpc.CallOption) (*UserNewsRes, error)
 	UserFollow(ctx context.Context, in *UserFollowReq, opts ...grpc.CallOption) (*UserFollowRes, error)
 	UserLike(ctx context.Context, in *UserLikeReq, opts ...grpc.CallOption) (*UserLikeRes, error)
@@ -32,9 +33,18 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) UserInfo(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRes, error) {
+func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserRes, error) {
 	out := new(GetUserRes)
-	err := c.cc.Invoke(ctx, "/UserService/UserInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/UserService/GetUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddUser(ctx context.Context, in *AddUserReq, opts ...grpc.CallOption) (*AddUserRes, error) {
+	out := new(AddUserRes)
+	err := c.cc.Invoke(ctx, "/UserService/AddUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +82,8 @@ func (c *userServiceClient) UserLike(ctx context.Context, in *UserLikeReq, opts 
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	UserInfo(context.Context, *GetUserReq) (*GetUserRes, error)
+	GetUser(context.Context, *GetUserReq) (*GetUserRes, error)
+	AddUser(context.Context, *AddUserReq) (*AddUserRes, error)
 	UserNews(context.Context, *UserNewsReq) (*UserNewsRes, error)
 	UserFollow(context.Context, *UserFollowReq) (*UserFollowRes, error)
 	UserLike(context.Context, *UserLikeReq) (*UserLikeRes, error)
@@ -83,8 +94,11 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) UserInfo(context.Context, *GetUserReq) (*GetUserRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UserInfo not implemented")
+func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserReq) (*GetUserRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUserServiceServer) AddUser(context.Context, *AddUserReq) (*AddUserRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUser not implemented")
 }
 func (UnimplementedUserServiceServer) UserNews(context.Context, *UserNewsReq) (*UserNewsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserNews not implemented")
@@ -108,20 +122,38 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _UserService_UserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).UserInfo(ctx, in)
+		return srv.(UserServiceServer).GetUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserService/UserInfo",
+		FullMethod: "/UserService/GetUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UserInfo(ctx, req.(*GetUserReq))
+		return srv.(UserServiceServer).GetUser(ctx, req.(*GetUserReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/AddUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddUser(ctx, req.(*AddUserReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -188,8 +220,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "UserInfo",
-			Handler:    _UserService_UserInfo_Handler,
+			MethodName: "GetUser",
+			Handler:    _UserService_GetUser_Handler,
+		},
+		{
+			MethodName: "AddUser",
+			Handler:    _UserService_AddUser_Handler,
 		},
 		{
 			MethodName: "UserNews",

@@ -5,18 +5,18 @@ option go_package = ".;v1";
 import "google/api/annotations.proto";
 //import "validate/validate.proto";
 
-service LoginService {
+service AuthService {
   rpc Register (RegisterReq) returns (RegisterRes) {
     option (google.api.http) = {
       //    添加User
-      post: "/v1/register"
+      post: "/v1/auth/register"
       body: "*"
     };
   };
 
   rpc Login (LoginReq) returns (LoginRes) {
     option (google.api.http) = {
-      post: "/v1/login"
+      post: "/v1/auth/login"
     };
   };
 
@@ -35,4 +35,7 @@ message LoginReq {
   string password = 3;
 }
 
-message LoginRes {}
+message LoginRes {
+  int64 id = 1;
+  string token = 2;
+}

@@ -2,5 +2,5 @@ package client
 
 
 const (
-	UserRepoAddr = "user-repo"
+	UserAddr = "user"
 )

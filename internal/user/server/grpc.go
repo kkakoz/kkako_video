@@ -9,7 +9,6 @@ import (
 
 func NewGrpcServer(handler *handler.UserHandler) *grpc.Server {
 	server := grpc.NewServer()
-	v1.RegisterLoginServiceServer(server, handler)
 	v1.RegisterUserServiceServer(server, handler)
 	return server
 }

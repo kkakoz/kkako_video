@@ -10,16 +10,21 @@ type User struct {
 	Avatar   string  `json:"avatar"`
 	Brief    string  `json:"brief"`
 	Salt     string  `json:"salt"`
+	Follows  []int64 `json:"follows"`
+	Fans     []int64 `json:"fans"`
+	Likes    []int64 `json:"likes"`
+	State    int32   `json:"state"`
 }
 
-type IUserService interface {
-	Register(ctx context.Context, user *User) error
-	Login(ctx context.Context, user *User) (string, error)
-	Get(ctx context.Context, id int64) (*User, error)
-	GetList(ctx context.Context, ids []int64) ([]*User, error)
+type IUserLogic interface {
+	AddUser(ctx context.Context, user *User) error
+	GetUser(ctx context.Context, id int64) (*User, error)
+	GetUsers(ctx context.Context, ids []int64) ([]*User, error)
 }
 
 type IUserRepo interface {
-	Get(ctx context.Context, id int64) (*User, error)
-	GetList(ctx context.Context, ids []int64) ([]*User, error)
+	AddUser(ctx context.Context, user *User) error
+	GetUser(ctx context.Context, id int64) (*User, error)
+	GetUserList(ctx context.Context, ids []int64) ([]*User, error)
+	GetUserByCond(ctx context.Context, email string) (*User, error)
 }

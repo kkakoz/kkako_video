@@ -2,33 +2,42 @@ package repo
 
 import (
 	"context"
-	"github.com/jinzhu/copier"
-	v1 "kkako_video/api/user/v1"
+	"github.com/pkg/errors"
 	"kkako_video/internal/user/domain"
+	"kkako_video/pkg/db/mysqlx"
 )
 
 type UserRepo struct {
-	userRepo v1.UserRepoServiceClient
+
 }
 
-func (u UserRepo) Get(ctx context.Context, id int64) (*domain.User, error) {
-	user, err := u.userRepo.GetUserById(ctx, &v1.UserIdReq{Id: id})
-	if err != nil {
-		return nil, err
-	}
-	res := &domain.User{}
-	err = copier.Copy(res, user)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+func NewUserRepo() domain.IUserRepo {
+	return &UserRepo{}
 }
 
-func (u UserRepo) GetList(ctx context.Context, ids []int64) ([]*domain.User, error) {
-	panic("implement me")
+func (u UserRepo) GetUserByCond(ctx context.Context, email string) (user *domain.User, err error) {
+	db := mysqlx.GetDB(ctx)
+	err = db.Where("email = ?", email).Find(user).Error
+	return user, errors.Wrap(err, "添加用户失败")
 }
 
-func NewUserRepo(userRepo v1.UserRepoServiceClient) *UserRepo {
-	return &UserRepo{userRepo: userRepo}
+func (u UserRepo) AddUser(ctx context.Context, user *domain.User) error {
+	db := mysqlx.GetDB(ctx)
+	err := db.Create(user).Error
+	return errors.Wrap(err, "添加用户失败")
+}
+
+func (u UserRepo) GetUser(ctx context.Context, id int64) (*domain.User, error) {
+	db := mysqlx.GetDB(ctx)
+	user := &domain.User{}
+	err := db.Where("id = ?", id).Find(user).Error
+	return user, errors.Wrap(err, "查找失败")
+}
+
+func (u UserRepo) GetUserList(ctx context.Context, ids []int64) ([]*domain.User, error) {
+	db := mysqlx.GetDB(ctx)
+	list := make([]*domain.User, 0)
+	err := db.Where("id in ?", ids).Find(&list).Error
+	return list, errors.Wrap(err, "查找失败")
 }
 

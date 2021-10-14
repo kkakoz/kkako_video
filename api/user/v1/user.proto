@@ -6,9 +6,16 @@ import "google/api/annotations.proto";
 //import "validate/validate.proto";
 
 service UserService {
-  rpc UserInfo (GetUserReq) returns (GetUserRes) {
+  rpc GetUser (GetUserReq) returns (GetUserRes) {
     option (google.api.http) = {
       get: "/v1/users/:id"
+      body: "*"
+    };
+  };
+
+  rpc AddUser (AddUserReq) returns (AddUserRes) {
+    option (google.api.http) = {
+      post: "/v1/users"
       body: "*"
     };
   };
@@ -44,7 +51,14 @@ message GetUserRes {
   string avatar = 3;
   string email = 4;
   string brief = 5;
+  int32 state = 6;
 }
+
+message AddUserReq {
+  string name = 1;
+}
+
+message AddUserRes {}
 
 message UserNewsReq {}
 
