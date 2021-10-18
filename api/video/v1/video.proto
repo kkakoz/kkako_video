@@ -6,14 +6,14 @@ import "google/api/annotations.proto";
 //import "validate/validate.proto";
 
 service VideoService {
-  rpc VideoInfo (VideoGetReq) returns (VideoGetRes) {
+  rpc GetVideo (GetVideoReq) returns (GetVideoRes) {
     option (google.api.http) = {
       get: "/v1/videos/:id"
       body: "*"
     };
   };
 
-  rpc Videos (VideoNewsReq) returns (VideoNewsRes) {
+  rpc GetVideos (VideoNewsReq) returns (VideoNewsRes) {
     option (google.api.http) = {
       get: "/v1/videos"
     };
@@ -28,16 +28,24 @@ service VideoService {
 
 }
 
-message VideoGetReq {
+message GetVideoReq {
   int64 id = 1;
 }
 
-message VideoGetRes {
+message GetVideoRes {
   int64 id = 1;
   string name = 2;
   string avatar = 3;
   string email = 4;
   string brief = 5;
+}
+
+message GetVideosReq {
+  string name = 1;
+  int32 type = 2;
+  int32 category = 3;
+  int32 page = 4;
+  int32 pageSize = 5;
 }
 
 message VideoNewsReq {}

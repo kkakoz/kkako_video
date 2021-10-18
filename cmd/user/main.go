@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
-	"kkako_video/internal/auth"
 	"kkako_video/internal/pkg/client"
+	"kkako_video/internal/user"
 	"kkako_video/pkg/app"
 	"kkako_video/pkg/conf"
 	"kkako_video/pkg/db/mysqlx"
@@ -15,7 +15,7 @@ import (
 	"os"
 )
 
-func newApp(ctx context.Context, grpcServer *grpc.Server) (*app.App, error) {
+func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server) (*app.App, error) {
 	options := make([]app.Option, 0)
 	var debug bool
 	flag.BoolVar(&debug, "debug", false, "false is from file, true is from env")
@@ -32,12 +32,14 @@ func newApp(ctx context.Context, grpcServer *grpc.Server) (*app.App, error) {
 		}
 		options = append(options, app.IP(ip))
 	}
-	options = append(options, app.Port("9001"), app.GrpcServer(grpcServer))
+	options = append(options, app.Port("9003"), app.GrpcServer(grpcServer))
 	return app.NewApp(
 		ctx,
+		cancel,
 		options...,
 	)
 }
+
 
 func main() {
 
@@ -50,17 +52,17 @@ func main() {
 	}
 	var app = new(app.App)
 	fx.New(
-		auth.Provider,
+		user.Provider,
 		fx.Supply(viper),
-		fx.Provide(func() context.Context {
-			return ctx
+		fx.Provide(func() (context.Context, context.CancelFunc) {
+			return ctx, cancel
 		}),
 		client.Provider,
 		fx.Provide(newApp),
 		fx.Populate(&app),
 	)
 	defer cancel()
-	if err := app.Start(); err != nil {  // 手动调用Start
+	if err = app.Start(); err != nil {  // 手动调用Start
 		log.Fatal(err)
 	}
 }

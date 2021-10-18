@@ -75,12 +75,12 @@ func Transaction(ctx context.Context, fc func(txctx context.Context) error) erro
 	})
 }
 
-func Begin(ctx context.Context, databaase *gorm.DB, opts ...*sql.TxOptions) (context.Context, *gorm.DB) {
-	tx := databaase.Begin(opts...)
+func Begin(ctx context.Context, opts ...*sql.TxOptions) (context.Context, *gorm.DB) {
+	tx := db.Begin(opts...)
 	return context.WithValue(ctx, ctxTransactionKey{}, tx), tx
 }
 
-func GetDB(ctx context.Context) (*gorm.DB) {
+func GetDB(ctx context.Context) *gorm.DB {
 	iface := ctx.Value(ctxTransactionKey{})
 
 	if iface != nil {
@@ -91,6 +91,17 @@ func GetDB(ctx context.Context) (*gorm.DB) {
 	}
 
 	return db.WithContext(ctx)
+}
+
+func CheckErr(database *gorm.DB, err error) error {
+	if err != nil {
+		curErr := database.Rollback().Error
+		if curErr != nil {
+			return curErr
+		}
+		return err
+	}
+	return database.Commit().Error
 }
 
 type Model struct {

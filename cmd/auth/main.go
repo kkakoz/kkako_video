@@ -71,7 +71,7 @@ func main() {
 		<-quit
 		cancel()
 	}()
-	if err := app.Start(); err != nil {  // 手动调用Start
+	if err = app.Start(); err != nil {
 		log.Fatal(err)
 	}
 }
