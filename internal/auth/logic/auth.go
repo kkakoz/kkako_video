@@ -21,7 +21,7 @@ func (u AuthLogic) Register(ctx context.Context, auth *domain.Auth, name string)
 		return err
 	}
 	if auth.ID != 0 {
-		return errors.New("该邮件已经注册")
+		return errors.New("该邮箱已经注册")
 	}
 	err = u.authRepo.AddAuth(ctx, auth)
 	if err != nil {

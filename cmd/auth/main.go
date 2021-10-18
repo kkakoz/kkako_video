@@ -4,20 +4,23 @@ import (
 	"context"
 	"flag"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"kkako_video/internal/auth"
+	"kkako_video/internal/auth/server"
 	"kkako_video/internal/pkg/client"
 	"kkako_video/pkg/app"
 	"kkako_video/pkg/conf"
 	"kkako_video/pkg/db/mysqlx"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server) (*app.App, error) {
+func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server, httpServer http.Handler) (*app.App, error) {
 	options := make([]app.Option, 0)
 	var debug bool
 	flag.BoolVar(&debug, "debug", false, "false is from file, true is from env")
@@ -34,7 +37,7 @@ func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Ser
 		}
 		options = append(options, app.IP(ip))
 	}
-	options = append(options, app.Port("9002"), app.GrpcServer(grpcServer))
+	options = append(options, app.Port(viper.GetString("app.port")), app.GrpcServer(grpcServer), app.HttpServer(httpServer))
 	return app.NewApp(
 		ctx,
 		cancel,
@@ -59,6 +62,7 @@ func main() {
 			return ctx, cancel
 		}),
 		client.Provider,
+		server.Provider,
 		fx.Provide(newApp),
 		fx.Populate(&app),
 	)

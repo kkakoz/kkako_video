@@ -8,8 +8,7 @@ import "google/api/annotations.proto";
 service VideoService {
   rpc GetVideo (GetVideoReq) returns (GetVideoRes) {
     option (google.api.http) = {
-      get: "/v1/videos/:id"
-      body: "*"
+      get: "/v1/videos/{id}"
     };
   };
 
@@ -46,6 +45,13 @@ message GetVideosReq {
   int32 category = 3;
   int32 page = 4;
   int32 pageSize = 5;
+}
+
+message User {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string brief = 4;
 }
 
 message VideoNewsReq {}

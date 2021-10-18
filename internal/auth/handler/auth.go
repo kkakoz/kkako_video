@@ -4,13 +4,13 @@ import (
 	"context"
 	v1 "kkako_video/api/user/v1"
 	"kkako_video/internal/auth/domain"
+	"kkako_video/pkg/db/mysqlx"
 )
 
 type AuthHandler struct {
 	v1.UnimplementedAuthServiceServer
 	userLogic domain.IAuthLogic
 }
-
 
 func (u AuthHandler) Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error) {
 	user := &domain.Auth{
@@ -31,5 +31,6 @@ func (u AuthHandler) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes,
 }
 
 func NewAuthHandler(userLogic domain.IAuthLogic) *AuthHandler {
+	mysqlx.GetDB(context.TODO()).AutoMigrate(&domain.Auth{})
 	return &AuthHandler{userLogic: userLogic}
 }

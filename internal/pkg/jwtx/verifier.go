@@ -1,6 +1,7 @@
 package jwtx
 
 import (
+	"context"
 	"crypto/rsa"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
@@ -56,4 +57,19 @@ func (v *JwtTokenVerifier) Verifier(token string) (*UserClaims, error) {
 	}
 
 	return clm, nil
+}
+
+var userClaimsKey struct{}
+
+func WithUser(ctx context.Context, claims *UserClaims) context.Context {
+	return context.WithValue(ctx, userClaimsKey, claims)
+}
+
+func GetUser(ctx context.Context) (*UserClaims, error) {
+	value := ctx.Value(userClaimsKey)
+	claims, ok := value.(*UserClaims)
+	if !ok {
+		return claims, errors.New("获取用户失败")
+	}
+	return claims, nil
 }

@@ -8,8 +8,7 @@ import "google/api/annotations.proto";
 service UserService {
   rpc GetUser (GetUserReq) returns (GetUserRes) {
     option (google.api.http) = {
-      get: "/v1/users/:id"
-      body: "*"
+      get: "/v1/users/{id}"
     };
   };
 
@@ -23,18 +22,21 @@ service UserService {
   rpc UserNews (UserNewsReq) returns (UserNewsRes) {
     option (google.api.http) = {
       post: "/v1/users/:id/news"
+      body: "*"
     };
   };
 
   rpc UserFollow (UserFollowReq) returns (UserFollowRes) {
     option (google.api.http) = {
       post: "/v1/users/:id/follows"
+      body: "*"
     };
   };
 
   rpc UserLike (UserLikeReq) returns (UserLikeRes) {
     option (google.api.http) = {
       post: "/v1/users/:id/likes"
+      body: "*"
     };
   };
 

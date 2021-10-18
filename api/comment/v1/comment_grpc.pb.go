@@ -19,8 +19,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CommentServiceClient interface {
 	AddComment(ctx context.Context, in *AddCommentReq, opts ...grpc.CallOption) (*AddCommentRes, error)
-	VideoCommentList(ctx context.Context, in *VideoCommentListReq, opts ...grpc.CallOption) (*VideoCommentListRes, error)
-	Comment(ctx context.Context, in *CommentReq, opts ...grpc.CallOption) (*CommentRes, error)
 }
 
 type commentServiceClient struct {
@@ -40,31 +38,11 @@ func (c *commentServiceClient) AddComment(ctx context.Context, in *AddCommentReq
 	return out, nil
 }
 
-func (c *commentServiceClient) VideoCommentList(ctx context.Context, in *VideoCommentListReq, opts ...grpc.CallOption) (*VideoCommentListRes, error) {
-	out := new(VideoCommentListRes)
-	err := c.cc.Invoke(ctx, "/CommentService/VideoCommentList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *commentServiceClient) Comment(ctx context.Context, in *CommentReq, opts ...grpc.CallOption) (*CommentRes, error) {
-	out := new(CommentRes)
-	err := c.cc.Invoke(ctx, "/CommentService/Comment", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CommentServiceServer is the server API for CommentService service.
 // All implementations must embed UnimplementedCommentServiceServer
 // for forward compatibility
 type CommentServiceServer interface {
 	AddComment(context.Context, *AddCommentReq) (*AddCommentRes, error)
-	VideoCommentList(context.Context, *VideoCommentListReq) (*VideoCommentListRes, error)
-	Comment(context.Context, *CommentReq) (*CommentRes, error)
 	mustEmbedUnimplementedCommentServiceServer()
 }
 
@@ -74,12 +52,6 @@ type UnimplementedCommentServiceServer struct {
 
 func (UnimplementedCommentServiceServer) AddComment(context.Context, *AddCommentReq) (*AddCommentRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComment not implemented")
-}
-func (UnimplementedCommentServiceServer) VideoCommentList(context.Context, *VideoCommentListReq) (*VideoCommentListRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VideoCommentList not implemented")
-}
-func (UnimplementedCommentServiceServer) Comment(context.Context, *CommentReq) (*CommentRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Comment not implemented")
 }
 func (UnimplementedCommentServiceServer) mustEmbedUnimplementedCommentServiceServer() {}
 
@@ -112,42 +84,6 @@ func _CommentService_AddComment_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommentService_VideoCommentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VideoCommentListReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CommentServiceServer).VideoCommentList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/CommentService/VideoCommentList",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommentServiceServer).VideoCommentList(ctx, req.(*VideoCommentListReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CommentService_Comment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommentReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CommentServiceServer).Comment(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/CommentService/Comment",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommentServiceServer).Comment(ctx, req.(*CommentReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // CommentService_ServiceDesc is the grpc.ServiceDesc for CommentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -158,14 +94,6 @@ var CommentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddComment",
 			Handler:    _CommentService_AddComment_Handler,
-		},
-		{
-			MethodName: "VideoCommentList",
-			Handler:    _CommentService_VideoCommentList_Handler,
-		},
-		{
-			MethodName: "Comment",
-			Handler:    _CommentService_Comment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

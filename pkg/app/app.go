@@ -6,7 +6,11 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"kkako_video/internal/pkg/handle"
+	"log"
 	"net"
+	"net/http"
+	"time"
 )
 
 type App struct {
@@ -17,6 +21,7 @@ type App struct {
 	Cancel     context.CancelFunc
 	Logger     *zap.Logger
 	GrpcServer *grpc.Server
+	HttpServer http.Handler
 	servers    []Server
 }
 
@@ -40,13 +45,6 @@ func (a *App) Start() error {
 		return err
 	}
 	reflection.Register(a.GrpcServer)
-	go func() {
-		<-a.Ctx.Done()
-		a.GrpcServer.Stop()
-		for _, server := range a.servers {
-			server.Stop()
-		}
-	}()
 	for _, server := range a.servers {
 		go func() {
 			err := server.Run()
@@ -56,10 +54,30 @@ func (a *App) Start() error {
 			}
 		}()
 	}
-	err = a.GrpcServer.Serve(listen)
+	handler := handle.ServerHandlerFunc(a.GrpcServer, a.HttpServer)
+	server := &http.Server{
+		Handler: handler,
+	}
+	// 延时关闭
+	go func() {
+		<-a.Ctx.Done()
+		ctx, _ := context.WithTimeout(context.TODO(), 5 * time.Second)
+		err := server.Shutdown(ctx)
+		if err != nil {
+			log.Fatalln("shutdown err:", err)
+		}
+		for _, s := range a.servers {
+			s.Stop()
+		}
+	}()
+	err = server.Serve(listen)
 	if err != nil {
 		return errors.Wrap(err, "app start err")
 	}
+	//err = a.GrpcServer.Serve(listen)
+	//if err != nil {
+	//	return errors.Wrap(err, "app start err")
+	//}
 
 	return nil
 }
@@ -108,6 +126,15 @@ func GrpcServer(server *grpc.Server) Option {
 	return Option{
 		f: func(app *App) error {
 			app.GrpcServer = server
+			return nil
+		},
+	}
+}
+
+func HttpServer(server http.Handler) Option {
+	return Option{
+		f: func(app *App) error {
+			app.HttpServer = server
 			return nil
 		},
 	}

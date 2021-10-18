@@ -9,20 +9,8 @@ service CommentService {
   rpc AddComment (AddCommentReq) returns (AddCommentRes) {
     option (google.api.http) = {
       post: "/v1/comments"
-      body: "*"
     };
   };
-
-  rpc VideoCommentList (VideoCommentListReq) returns (VideoCommentListRes) {
-
-  };
-
-  rpc Comment (CommentReq) returns (CommentRes) {
-    option (google.api.http) = {
-      get: "/v1/comments/:id"
-    };
-  }
-
 }
 
 message AddCommentReq {
