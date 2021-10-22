@@ -7,6 +7,12 @@ import (
 	"kkako_video/pkg/db/mysqlx"
 )
 
+var _ domain.IAuthRepo = (*Auth)(nil)
+
+func NewAuthRepo() domain.IAuthRepo {
+	return &Auth{}
+}
+
 type Auth struct {
 
 }
@@ -35,8 +41,4 @@ func (a Auth) GetAuth(ctx context.Context, id int64) (*domain.Auth, error) {
 	user := &domain.Auth{}
 	err := db.Where("id = ?", id).Find(user).Error
 	return user, errors.Wrap(err, "查找失败")
-}
-
-func NewAuthRepo() domain.IAuthRepo {
-	return &Auth{}
 }

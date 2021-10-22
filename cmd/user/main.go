@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"flag"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"kkako_video/internal/pkg/client"
@@ -17,9 +17,7 @@ import (
 
 func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server) (*app.App, error) {
 	options := make([]app.Option, 0)
-	var debug bool
-	flag.BoolVar(&debug, "debug", false, "false is from file, true is from env")
-	flag.Parse()
+	debug := viper.GetViper().GetBool("app.debug")
 	if !debug {
 		name, b := os.LookupEnv("MY_POD_NAME")
 		if !b {
@@ -32,7 +30,7 @@ func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Ser
 		}
 		options = append(options, app.IP(ip))
 	}
-	options = append(options, app.Port("9003"), app.GrpcServer(grpcServer))
+	options = append(options, app.Port(viper.GetString("app.port")), app.GrpcServer(grpcServer))
 	return app.NewApp(
 		ctx,
 		cancel,
@@ -43,17 +41,17 @@ func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Ser
 
 func main() {
 
-	viper := conf.ParseConf()
+	config := conf.ParseConf()
 	ctx, cancel := context.WithCancel(context.TODO())
 
-	_, err := mysqlx.New(viper)
+	_, err := mysqlx.New(config)
 	if err != nil {
 		log.Fatalln("open mysql err:", err)
 	}
 	var app = new(app.App)
 	fx.New(
 		user.Provider,
-		fx.Supply(viper),
+		fx.Supply(config),
 		fx.Provide(func() (context.Context, context.CancelFunc) {
 			return ctx, cancel
 		}),

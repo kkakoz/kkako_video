@@ -1,9 +1,8 @@
 syntax = "proto3";
 
-option go_package = ".;v1";
+option go_package = "kkako_video/api/comment/v1";
 
 import "google/api/annotations.proto";
-//import "validate/validate.proto";
 
 service AuthService {
   rpc Register (RegisterReq) returns (RegisterRes) {

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -30,6 +32,20 @@ func NewApp(ctx context.Context, cancel context.CancelFunc, opts ...Option) (*Ap
 		Ctx:    ctx,
 		Cancel: cancel,
 	}
+	mode := viper.GetViper().GetString("app.mode")
+	if mode == "test" || mode == "pro" {
+		name, b := os.LookupEnv("MY_POD_NAME")
+		if !b {
+			return nil, errors.New("get name err")
+		}
+		app.Name = name
+		ip, b := os.LookupEnv("MY_POD_IP")
+		if !b {
+			return nil, errors.New("get ip err")
+		}
+		app.IP = ip
+	}
+	app.Port = viper.GetString("app.port")
 	for _, opt := range opts {
 		err := opt.f(app)
 		if err != nil {

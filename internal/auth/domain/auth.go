@@ -1,6 +1,8 @@
 package domain
 
-import "context"
+import (
+	"context"
+)
 
 type Auth struct {
 	ID       int64  `json:"id"`

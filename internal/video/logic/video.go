@@ -8,7 +8,7 @@ import (
 )
 
 type VideoLogic struct {
-	videoRepo domain.IVideoRepo
+	videoRepo  domain.IVideoRepo
 }
 
 func (v VideoLogic) AddVideo(ctx context.Context, video *domain.Video) error {

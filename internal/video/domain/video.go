@@ -6,18 +6,19 @@ import (
 )
 
 type Video struct {
-	ID        int64      `json:"id"`
-	Name      string     `json:"name"`
-	Type      int32      `json:"type"`
-	Category  int32      `json:"category"`
-	Cover     string     `json:"cover"` // 封面
-	Brief     string     `json:"brief"`
-	View      int64      `json:"view"`
-	Like      int64      `json:"like"`
-	Collect   int64      `json:"collect"`
-	Episodes  []*Episode `json:"episodes"`
-	CreatorId int64      `json:"user_id"`
-	Creator   *User      `json:"creator"`
+	ID         int64      `json:"id"`
+	Name       string     `json:"name"`
+	Type       int32      `json:"type"`
+	Category   int32      `json:"category"`
+	Cover      string     `json:"cover"` // 封面
+	Brief      string     `json:"brief"`
+	View       int64      `json:"view"`
+	Like       int64      `json:"like"`
+	Collect    int64      `json:"collect"`
+	Episodes   []*Episode `json:"episodes"`
+	UserId     int64      `json:"user_id"`
+	UserName   string     `json:"user_name"`
+	UserAvatar string     `json:"user_avatar"`
 }
 
 type Episode struct {
@@ -26,13 +27,6 @@ type Episode struct {
 	PreId   int64 `json:"pre_id"`
 	NextId  int64 `json:"next_id"`
 	Url     int64 `json:"url"`
-}
-
-type User struct {
-	ID     int64  `json:"id"`
-	Name   string `json:"name"`
-	Avatar string `json:"avatar"`
-	Brief  string `json:"brief"`
 }
 
 type IVideoLogic interface {

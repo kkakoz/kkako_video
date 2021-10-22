@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	v1 "kkako_video/api/user/v1"
 	"kkako_video/internal/auth/handler"
+	"kkako_video/internal/pkg/middle"
 	"net/http"
 )
 
@@ -18,7 +19,7 @@ func NewGrpcServer(handler *handler.AuthHandler) *grpc.Server {
 
 func NewHttpServer(handler *handler.AuthHandler) (http.Handler, error) {
 	gwmux := runtime.NewServeMux(
-		//runtime.WithErrorHandler(NewHandleErr(logger)),
+		runtime.WithErrorHandler(middle.GatewayErrHandler()),
 		)
 	err := v1.RegisterAuthServiceHandlerServer(context.TODO(), gwmux, handler)
 	if err != nil {

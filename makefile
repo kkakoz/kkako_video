@@ -1,7 +1,7 @@
 
 .PHONY: protoc
 protoc:
-		protoc -I. -I ./third_party  \
+		protoc -I. -I ./third_party -I ./api \
 			--go_out . --go_opt paths=source_relative \
 			--go-grpc_out . --go-grpc_opt paths=source_relative \
 			--grpc-gateway_out . \
@@ -12,24 +12,8 @@ protoc:
 ##		--go-gin_out . --go-gin_opt=paths=source_relative \
 
 
-.PHONY: baseProto
-baseProto:
-		protoc -I. -I ./third_party  \
-			--go_out=plugins=grpc:./api/user/v1/ \
-			 ./api/user/v1/*.proto
-#	@for f in api/*; \
-#	do \
-#	  for v in $$f/*; \
-#	  	do \
-#  	  		for proto in $$v/*; \
-#  	  		do \
-#			  protoc --proto_path=. -I ./third_party \
-#				--go_out . --go_opt paths=source_relative \
-#				--go-grpc_out . --go-grpc_opt paths=source_relative \
-#				--go-gin_out . --go-gin_opt=paths=source_relative \
-#				$$proto; \
-#		   done ;\
-#  		done ;\
-#  	done
+.PHONY: mock
+mock:
+	mockgen -source=api/user/v1/user_grpc.pb.go -destination=api/user/v1/user_grpc_mock.go -package=v1
 
 

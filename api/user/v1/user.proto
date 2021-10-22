@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = ".;v1";
+option go_package = "kkako_video/api/comment/v1";
 
 import "google/api/annotations.proto";
 //import "validate/validate.proto";
@@ -79,3 +79,16 @@ message UserLikeReq {
 }
 
 message UserLikeRes {}
+
+message User {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string brief = 4;
+}
+
+message Count {
+  int64 followCount = 1;
+  int64 fansCount = 2;
+  int64 likeCount = 3;
+}

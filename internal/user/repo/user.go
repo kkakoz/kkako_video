@@ -7,12 +7,13 @@ import (
 	"kkako_video/pkg/db/mysqlx"
 )
 
-type UserRepo struct {
-
-}
+var _ domain.IUserRepo = (*UserRepo)(nil)
 
 func NewUserRepo() domain.IUserRepo {
 	return &UserRepo{}
+}
+
+type UserRepo struct {
 }
 
 func (u UserRepo) GetUserByCond(ctx context.Context, email string) (user *domain.User, err error) {
@@ -40,4 +41,3 @@ func (u UserRepo) GetUserList(ctx context.Context, ids []int64) ([]*domain.User,
 	err := db.Where("id in ?", ids).Find(&list).Error
 	return list, errors.Wrap(err, "查找失败")
 }
-

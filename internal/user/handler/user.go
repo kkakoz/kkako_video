@@ -7,6 +7,12 @@ import (
 	"kkako_video/internal/user/domain"
 )
 
+var _ v1.UserServiceServer = (*UserHandler)(nil)
+
+func NewUserHandler(userLogic domain.IUserLogic) *UserHandler {
+	return &UserHandler{userLogic: userLogic}
+}
+
 type UserHandler struct {
 	v1.UnimplementedUserServiceServer
 	userLogic domain.IUserLogic
@@ -42,8 +48,4 @@ func (u UserHandler) AddUser(ctx context.Context, req *v1.AddUserReq) (*v1.AddUs
 	}
 	err = u.userLogic.AddUser(ctx, user)
 	return &v1.AddUserRes{}, err
-}
-
-func NewUserHandler(userLogic domain.IUserLogic) *UserHandler {
-	return &UserHandler{userLogic: userLogic}
 }

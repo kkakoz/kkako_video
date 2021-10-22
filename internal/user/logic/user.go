@@ -5,6 +5,12 @@ import (
 	"kkako_video/internal/user/domain"
 )
 
+var _ domain.IUserLogic = (*UserLogic)(nil)
+
+func NewUserLogic() domain.IUserLogic {
+	return &UserLogic{}
+}
+
 type UserLogic struct {
 	userRepo domain.IUserRepo
 }
@@ -19,8 +25,4 @@ func (u UserLogic) GetUser(ctx context.Context, id int64) (*domain.User, error) 
 
 func (u UserLogic) GetUsers(ctx context.Context, ids []int64) ([]*domain.User, error) {
 	return u.userRepo.GetUserList(ctx, ids)
-}
-
-func NewUserLogic() domain.IUserLogic {
-	return &UserLogic{}
 }

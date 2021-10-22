@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+var _ domain.IAuthLogic = (*AuthLogic)(nil)
+
+func NewAuthLogic(userCli v1.UserServiceClient, authRepo domain.IAuthRepo, jwtGen *jwtx.JwtTokenGen) domain.IAuthLogic {
+	return &AuthLogic{userCli: userCli, authRepo: authRepo, jwtGen: jwtGen}
+}
+
 type AuthLogic struct {
 	userCli  v1.UserServiceClient
 	authRepo domain.IAuthRepo
@@ -54,6 +60,3 @@ func (u AuthLogic) Login(ctx context.Context, auth *domain.Auth) (int64, string,
 	return auth.UserId, token, nil
 }
 
-func NewAuthLogic(userCli v1.UserServiceClient, authRepo domain.IAuthRepo, jwtGen *jwtx.JwtTokenGen) domain.IAuthLogic {
-	return &AuthLogic{userCli: userCli, authRepo: authRepo, jwtGen: jwtGen}
-}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = ".;v1";
+option go_package = "kkako_video/api/comment/v1";
 
 import "google/api/annotations.proto";
 //import "validate/validate.proto";
@@ -45,13 +45,6 @@ message GetVideosReq {
   int32 category = 3;
   int32 page = 4;
   int32 pageSize = 5;
-}
-
-message User {
-  int64 id = 1;
-  string name = 2;
-  string avatar = 3;
-  string brief = 4;
 }
 
 message VideoNewsReq {}

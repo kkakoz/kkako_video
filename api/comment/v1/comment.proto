@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-option go_package = ".;v1";
+//option go_package = ".;v1";
+option go_package = "kkako_video/api/comment/v1";
 
 import "google/api/annotations.proto";
 //import "validate/validate.proto";
@@ -20,15 +21,6 @@ message AddCommentReq {
 }
 
 message AddCommentRes {}
-
-message VideoCommentListReq {
-  int64 videoId = 1;
-  int32 sort = 2;
-}
-
-message VideoCommentListRes {
-  repeated CommentReq items = 1;
-}
 
 message CommentReq {}
 

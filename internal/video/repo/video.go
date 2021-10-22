@@ -20,12 +20,28 @@ func (v *VideoRepo) AddVideo(ctx context.Context, video *domain.Video) error {
 func (v *VideoRepo) GetVideo(ctx context.Context, videoId int64) (*domain.Video, error) {
 	db := mysqlx.GetDB(ctx)
 	video := &domain.Video{}
-	err := db.Where("id = ?", videoId).Find(video).Error
+	err := db.Preload("Episodes").Where("id = ?", videoId).Find(video).Error
 	return video, errors.Wrap(err, "查询失败")
 }
 
 func (v *VideoRepo) GetVideos(ctx context.Context, video *domain.Video, pager *model.Pager) ([]*domain.Video, error) {
-	panic("implement me")
+	db := mysqlx.GetDB(ctx)
+	db = pager.Paging(db)
+	if video.Type != 0 {
+		db = db.Where("type = ?", video.Type)
+	}
+	if video.Category != 0 {
+		db = db.Where("category = ?", video.Category)
+	}
+	if video.Type != 0 {
+		db = db.Where("type = ?", video.Type)
+	}
+	if video.Type != 0 {
+		db = db.Where("type = ?", video.Type)
+	}
+	videos := make([]*domain.Video, 0)
+	err := db.Find(&videos).Error
+	return videos, err
 }
 
 func (v *VideoRepo) AddEpisode(ctx context.Context, episode *domain.Episode) error {
