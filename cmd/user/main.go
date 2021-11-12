@@ -8,11 +8,15 @@ import (
 	"google.golang.org/grpc"
 	"kkako_video/internal/pkg/client"
 	"kkako_video/internal/user"
+	"kkako_video/internal/user/server"
 	"kkako_video/pkg/app"
+	"kkako_video/pkg/cache"
 	"kkako_video/pkg/conf"
 	"kkako_video/pkg/db/mysqlx"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Server) (*app.App, error) {
@@ -30,14 +34,13 @@ func newApp(ctx context.Context, cancel context.CancelFunc, grpcServer *grpc.Ser
 		}
 		options = append(options, app.IP(ip))
 	}
-	options = append(options, app.Port(viper.GetString("app.port")), app.GrpcServer(grpcServer))
+	options = append(options, app.GrpcServer(grpcServer))
 	return app.NewApp(
 		ctx,
 		cancel,
 		options...,
 	)
 }
-
 
 func main() {
 
@@ -49,18 +52,31 @@ func main() {
 		log.Fatalln("open mysql err:", err)
 	}
 	var app = new(app.App)
-	fx.New(
+	err = fx.New(
 		user.Provider,
 		fx.Supply(config),
 		fx.Provide(func() (context.Context, context.CancelFunc) {
 			return ctx, cancel
 		}),
+		cache.Provider,
 		client.Provider,
+		server.Provider,
 		fx.Provide(newApp),
 		fx.Populate(&app),
-	)
+	).Err()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// 用于捕获退出信号
+	quit := make(chan os.Signal)
+
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
-	if err = app.Start(); err != nil {  // 手动调用Start
+	go func() {
+		<-quit
+		cancel()
+	}()
+	if err = app.Start(); err != nil {
 		log.Fatal(err)
 	}
 }

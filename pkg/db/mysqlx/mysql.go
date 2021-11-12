@@ -75,9 +75,16 @@ func Transaction(ctx context.Context, fc func(txctx context.Context) error) erro
 	})
 }
 
-func Begin(ctx context.Context, opts ...*sql.TxOptions) (context.Context, *gorm.DB) {
+func Begin(ctx context.Context, opts ...*sql.TxOptions) (context.Context, CheckError) {
 	tx := db.Begin(opts...)
-	return context.WithValue(ctx, ctxTransactionKey{}, tx), tx
+	return context.WithValue(ctx, ctxTransactionKey{}, tx), func(err error) error {
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		err = tx.Commit().Error
+		return err
+	}
 }
 
 func GetDB(ctx context.Context) *gorm.DB {
@@ -124,3 +131,5 @@ func FlushDB() {
 	}
 
 }
+
+type CheckError func(err error) error

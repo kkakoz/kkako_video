@@ -23,6 +23,8 @@ type UserServiceClient interface {
 	UserNews(ctx context.Context, in *UserNewsReq, opts ...grpc.CallOption) (*UserNewsRes, error)
 	UserFollow(ctx context.Context, in *UserFollowReq, opts ...grpc.CallOption) (*UserFollowRes, error)
 	UserLike(ctx context.Context, in *UserLikeReq, opts ...grpc.CallOption) (*UserLikeRes, error)
+	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterRes, error)
+	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
 }
 
 type userServiceClient struct {
@@ -78,6 +80,24 @@ func (c *userServiceClient) UserLike(ctx context.Context, in *UserLikeReq, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterRes, error) {
+	out := new(RegisterRes)
+	err := c.cc.Invoke(ctx, "/UserService/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error) {
+	out := new(LoginRes)
+	err := c.cc.Invoke(ctx, "/UserService/Login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -87,6 +107,8 @@ type UserServiceServer interface {
 	UserNews(context.Context, *UserNewsReq) (*UserNewsRes, error)
 	UserFollow(context.Context, *UserFollowReq) (*UserFollowRes, error)
 	UserLike(context.Context, *UserLikeReq) (*UserLikeRes, error)
+	Register(context.Context, *RegisterReq) (*RegisterRes, error)
+	Login(context.Context, *LoginReq) (*LoginRes, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -108,6 +130,12 @@ func (UnimplementedUserServiceServer) UserFollow(context.Context, *UserFollowReq
 }
 func (UnimplementedUserServiceServer) UserLike(context.Context, *UserLikeReq) (*UserLikeRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserLike not implemented")
+}
+func (UnimplementedUserServiceServer) Register(context.Context, *RegisterReq) (*RegisterRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedUserServiceServer) Login(context.Context, *LoginReq) (*LoginRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -212,6 +240,42 @@ func _UserService_UserLike_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/Register",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Register(ctx, req.(*RegisterReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserService/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).Login(ctx, req.(*LoginReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +302,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserLike",
 			Handler:    _UserService_UserLike_Handler,
+		},
+		{
+			MethodName: "Register",
+			Handler:    _UserService_Register_Handler,
+		},
+		{
+			MethodName: "Login",
+			Handler:    _UserService_Login_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

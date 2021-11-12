@@ -40,12 +40,21 @@ func (u UserHandler) UserLike(ctx context.Context, req *v1.UserLikeReq) (*v1.Use
 	panic("implement me")
 }
 
-func (u UserHandler) AddUser(ctx context.Context, req *v1.AddUserReq) (*v1.AddUserRes, error) {
-	user := &domain.User{}
-	err := copier.Copy(user, req)
-	if err != nil {
-		return nil, err
+func (u UserHandler) Register(ctx context.Context, req *v1.RegisterReq) (*v1.RegisterRes, error) {
+	auth := &domain.Auth{
+		Email:    req.Email,
+		Password: req.Password,
+		Name:     req.Name,
 	}
-	err = u.userLogic.AddUser(ctx, user)
-	return &v1.AddUserRes{}, err
+	err := u.userLogic.Register(ctx, auth)
+	return &v1.RegisterRes{}, err
+}
+
+func (u UserHandler) Login(ctx context.Context, req *v1.LoginReq) (*v1.LoginRes, error) {
+	user := &domain.Auth{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+	token, err := u.userLogic.Login(ctx, user)
+	return &v1.LoginRes{Token: token}, err
 }

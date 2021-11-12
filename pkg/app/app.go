@@ -7,18 +7,16 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"kkako_video/internal/pkg/handle"
-	"log"
 	"net"
 	"net/http"
 	"os"
-	"time"
 )
 
 type App struct {
 	Name       string `json:"name"`
 	Port       string `json:"port"`
 	IP         string `json:"ip"`
+	HttpPort   string `json:"http_port"`
 	Ctx        context.Context
 	Cancel     context.CancelFunc
 	Logger     *zap.Logger
@@ -29,8 +27,10 @@ type App struct {
 
 func NewApp(ctx context.Context, cancel context.CancelFunc, opts ...Option) (*App, error) {
 	app := &App{
-		Ctx:    ctx,
-		Cancel: cancel,
+		Ctx:      ctx,
+		Cancel:   cancel,
+		Port:     "9001",
+		HttpPort: "10001",
 	}
 	mode := viper.GetViper().GetString("app.mode")
 	if mode == "test" || mode == "pro" {
@@ -56,10 +56,11 @@ func NewApp(ctx context.Context, cancel context.CancelFunc, opts ...Option) (*Ap
 }
 
 func (a *App) Start() error {
-	listen, err := net.Listen("tcp", ":"+a.Port)
+	grpcConn, err := net.Listen("tcp", ":"+a.Port)
 	if err != nil {
 		return err
 	}
+
 	reflection.Register(a.GrpcServer)
 	for _, server := range a.servers {
 		go func() {
@@ -70,26 +71,15 @@ func (a *App) Start() error {
 			}
 		}()
 	}
-	handler := handle.ServerHandlerFunc(a.GrpcServer, a.HttpServer)
-	server := &http.Server{
-		Handler: handler,
-	}
-	// 延时关闭
 	go func() {
 		<-a.Ctx.Done()
-		ctx, _ := context.WithTimeout(context.TODO(), 5 * time.Second)
-		err := server.Shutdown(ctx)
-		if err != nil {
-			log.Fatalln("shutdown err:", err)
-		}
+		a.GrpcServer.Stop()
 		for _, s := range a.servers {
 			s.Stop()
 		}
 	}()
-	err = server.Serve(listen)
-	if err != nil {
-		return errors.Wrap(err, "app start err")
-	}
+	go a.ServerHttp()
+	a.ServerGrpc(grpcConn)
 	//err = a.GrpcServer.Serve(listen)
 	//if err != nil {
 	//	return errors.Wrap(err, "app start err")
@@ -153,5 +143,31 @@ func HttpServer(server http.Handler) Option {
 			app.HttpServer = server
 			return nil
 		},
+	}
+}
+
+func (a *App) ServerGrpc(conn net.Listener) {
+	if a.GrpcServer == nil {
+		a.Logger.Fatal("grpc server is nil")
+	}
+	err := a.GrpcServer.Serve(conn)
+	if err != nil {
+		a.Logger.Fatal("start grpc server err:", zap.Error(err))
+		a.Cancel()
+	}
+}
+
+func (a *App) ServerHttp() {
+	if a.HttpServer == nil {
+		return
+	}
+	conn, err := net.Listen("tcp", ":"+a.HttpPort)
+	if err != nil {
+		a.Logger.Fatal("app http server port is nil")
+	}
+	err = http.Serve(conn, a.HttpServer)
+	if err != nil {
+		a.Logger.Fatal("start http server err:", zap.Error(err))
+		a.Cancel()
 	}
 }

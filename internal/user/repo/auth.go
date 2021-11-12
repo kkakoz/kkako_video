@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 	"github.com/pkg/errors"
-	"kkako_video/internal/auth/domain"
+	"kkako_video/internal/user/domain"
 	"kkako_video/pkg/db/mysqlx"
 )
 
